@@ -1,3 +1,10 @@
+# [1.1.0-develop.3](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-develop.2...v1.1.0-develop.3) (2024-11-19)
+
+
+### Bug Fixes
+
+* missing new symbol when creating types ([9c86b2e](https://github.com/Hertzole/pure-dependencies/commit/9c86b2e80d6b799240a86cd744e05dcfd3916c96))
+
 # [1.1.0-develop.2](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-develop.1...v1.1.0-develop.2) (2024-11-19)
 
 
