@@ -28,7 +28,7 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 			       .SelectMany(static (data, _) => data)
 			       .Collect();
 
-		IncrementalValueProvider<ImmutableArray<KeyValuePair<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>>>> requiredArrays = 
+		IncrementalValueProvider<ImmutableArray<KeyValuePair<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>>>> requiredArrays =
 			singletons.SelectMany(GetRequiredArrays).Collect();
 
 		IncrementalValueProvider<ImmutableArray<ServiceProviderData>> serviceProviders =
@@ -66,10 +66,16 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 			{
 				cancellationToken.ThrowIfCancellationRequested();
 
+				string? factory = null;
+				if (attribute.TryGetNamedArgument("Factory", out object? factoryValue))
+				{
+					factory = factoryValue as string;
+				}
+
 				if (attribute.ConstructorArguments.Length == 1 &&
 				    attribute.ConstructorArguments[0].Value is INamedTypeSymbol typeSymbol)
 				{
-					builder.Add(new TypeToGenerate(classSymbol, new TypeDefinition(typeSymbol)));
+					builder.Add(new TypeToGenerate(classSymbol, new TypeDefinition(typeSymbol), factory));
 				}
 			}
 
@@ -82,8 +88,9 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 			return ImmutableArray<TypeToGenerate>.Empty;
 		}
 	}
-	
-	private static IEnumerable<KeyValuePair<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>>> GetRequiredArrays(ImmutableArray<TypeToGenerate> array, CancellationToken token)
+
+	private static IEnumerable<KeyValuePair<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>>> GetRequiredArrays(ImmutableArray<TypeToGenerate> array,
+		CancellationToken token)
 	{
 		ImmutableArray<RequiredArray>.Builder builder = ImmutableArray.CreateBuilder<RequiredArray>();
 		ImmutableDictionary<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>.Builder>.Builder dictionary =
@@ -222,8 +229,7 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 			foreach (TypeToGenerate toGenerate in typesToGenerate)
 			{
 				//TODO: Check type and write the correct method
-				TypeDefinition typeDefinition = toGenerate.Type;
-				WriteSingleton(in productionContext, in typeDefinition, type);
+				WriteSingleton(in productionContext, in toGenerate, type);
 			}
 
 			foreach (KeyValuePair<INamedTypeSymbol, ImmutableArray<INamedTypeSymbol>> requiredArray in requiredArrays)
@@ -235,23 +241,23 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 		productionContext.AddSource(GetHintName(data), file.ToString());
 	}
 
-	private static void WriteSingleton(in SourceProductionContext context, in TypeDefinition type, ClassScope typeScope)
+	private static void WriteSingleton(in SourceProductionContext context, in TypeToGenerate type, ClassScope typeScope)
 	{
 		context.CancellationToken.ThrowIfCancellationRequested();
 
 		using PoolHandle<StringBuilder> stringBuilderScope = StringBuilderPool.Get(out StringBuilder? sb);
 
 		sb.Clear();
-		sb.Append(type.Name.FullyQualifiedName);
+		sb.Append(type.Type.Name.FullyQualifiedName);
 		sb.Append('?');
 
 		string fieldType = sb.ToString();
 
-		typeScope.AddField(type.Name.MinimalName, fieldType).WithAccessor(FieldAccessor.Private).WithDefaultValue("null").Dispose();
+		typeScope.AddField(type.Type.Name.MinimalName, fieldType).WithAccessor(FieldAccessor.Private).WithDefaultValue("null").Dispose();
 
 		sb.Clear();
 		sb.Append("global::Hertzole.PureDependencies.IServiceProvider<");
-		sb.Append(type.Name.FullyQualifiedName);
+		sb.Append(type.Type.Name.FullyQualifiedName);
 		sb.Append(">");
 
 		string interfaceName = sb.ToString();
@@ -264,15 +270,15 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 
 		string methodName = sb.ToString();
 
-		using (MethodScope getService = typeScope.AddMethod(methodName, type.Name.FullyQualifiedName))
+		using (MethodScope getService = typeScope.AddMethod(methodName, type.Type.Name.FullyQualifiedName))
 		{
 			getService.Append("if (");
-			getService.Append(type.Name.MinimalName);
+			getService.Append(type.Type.Name.MinimalName);
 			getService.AppendLine(" == null)");
 
 			using (getService.WithIndent(1, true))
 			{
-				foreach (RequiredMemberData requiredMember in type.RequiredMembers)
+				foreach (RequiredMemberData requiredMember in type.Type.RequiredMembers)
 				{
 					bool isCollection = requiredMember.TryGetCollection(out _);
 
@@ -296,7 +302,7 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 					getService.AppendLine(">) this).GetService();");
 				}
 
-				if (type.RequiredMembers.Length > 0)
+				if (type.Type.RequiredMembers.Length > 0)
 				{
 					getService.AppendLine();
 				}
@@ -305,28 +311,38 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 
 				using (getService.WithIndent(1, true))
 				{
-					getService.Append(type.Name.MinimalName);
-					getService.Append(" = new ");
-					getService.Append(type.Name.FullyQualifiedName);
-					getService.Append('(');
+					getService.Append(type.Type.Name.MinimalName);
+					getService.Append(" = ");
 
-					for (int i = 0; i < type.RequiredMembers.Length; i++)
+					// Write a normal 'new' instance.
+					if (string.IsNullOrEmpty(type.Factory))
 					{
-						if (i > 0)
+						getService.Append(type.Type.Name.FullyQualifiedName);
+						getService.Append('(');
+
+						for (int i = 0; i < type.Type.RequiredMembers.Length; i++)
 						{
-							getService.Append(", ");
+							if (i > 0)
+							{
+								getService.Append(", ");
+							}
+
+							getService.Append(type.Type.RequiredMembers[i].ParameterName);
 						}
 
-						getService.Append(type.RequiredMembers[i].ParameterName);
+						getService.AppendLine(");");
 					}
-
-					getService.AppendLine(");");
+					else // Use the provided factory method
+					{
+						getService.Append(type.Factory!);
+						getService.AppendLine("();");
+					}
 				}
 			}
 
 			getService.AppendLine();
 			getService.Append("return ");
-			getService.Append(type.Name.MinimalName);
+			getService.Append(type.Type.Name.MinimalName);
 			getService.Append(';');
 		}
 	}
