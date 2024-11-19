@@ -18,6 +18,7 @@ jobs:
       - name: Set executable permissions for prepare.sh
         run: chmod +x ./ci/prepare.sh
 
+      # Make sure something can be released
       - name: Release Preview
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
