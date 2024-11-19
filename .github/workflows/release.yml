@@ -15,13 +15,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9
+
+      - name: First build
+        id: first_build
+        run: dotnet build -c Release
+
       - name: Set executable permissions
+        if: steps.first_build.outcome == 'success'
         run: |
           chmod +x ./ci/prepare.sh
           chmod +x ./ci/format_version.sh
 
       - name: Release
         id: semantic
+        if: steps.first_build.outcome == 'success'
         uses: cycjimmy/semantic-release-action@v4
         with:
           extra_plugins: |
@@ -31,17 +42,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install .NET
-        uses: actions/setup-dotnet@v4
-        if: steps.semantic.outputs.new_release_published == 'true'
-        with:
-          dotnet-version: 9
-
       - name: Add NuGet Source
         if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
-      - name: Build
+      - name: Release Build
         if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet build -c Release
 
