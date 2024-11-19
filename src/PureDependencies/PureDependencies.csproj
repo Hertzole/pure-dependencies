@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <AssemblyName>Hertzole.PureDependencies</AssemblyName>
         <RootNamespace>Hertzole.PureDependencies</RootNamespace>
-        <AssemblyVersion>0.1.0.0</AssemblyVersion>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
         <FileVersion>0.1.0.0</FileVersion>
         
     </PropertyGroup>
@@ -13,7 +13,7 @@
         <Title>Pure Dependencies</Title>
         <Authors>Hertzole</Authors>
         <Company>Hertzole</Company>
-        <Version>0.1.0.0</Version>
+        <Version>1.0.0</Version>
         <Description>Source generated dependency injection</Description>
     </PropertyGroup>
 
