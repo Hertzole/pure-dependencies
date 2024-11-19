@@ -317,6 +317,7 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 					// Write a normal 'new' instance.
 					if (string.IsNullOrEmpty(type.Factory))
 					{
+						getService.Append("new ");
 						getService.Append(type.Type.Name.FullyQualifiedName);
 						getService.Append('(');
 
