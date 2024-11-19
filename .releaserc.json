@@ -6,7 +6,7 @@
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "./ci/prepare.sh $(./ci/format_version.sh ${nextRelease.version} ${branch.name})"
+                "prepareCmd": "./ci/prepare.sh ${nextRelease.version} ${branch.name}"
             }
         ],
         [
@@ -32,7 +32,7 @@
         },
         {
             "name": "develop",
-            "prerelease": true
+            "prerelease": "beta"
         }
     ]
 }
