@@ -192,7 +192,10 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 		productionContext.CancellationToken.ThrowIfCancellationRequested();
 
 		using FileScope file = codeBuilder.NewFile().EnableNullable();
-		using (ClassScope type = file.AddClass(data.TypeName.MinimalName).Partial().WithNamespace(data.TypeName.Namespace))
+		using (ClassScope type = file.AddClass(data.TypeName.MinimalName)
+		                             .Partial()
+		                             .WithNamespace(data.TypeName.Namespace)
+		                             .WithInterface("global::System.IServiceProvider"))
 		{
 			if (!data.IsSealed)
 			{
@@ -226,6 +229,8 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 				WriteDisposeMethod(typesToGenerate, type);
 			}
 
+			WriteServiceProviderGetService(in productionContext, in typesToGenerate, type);
+
 			foreach (TypeToGenerate toGenerate in typesToGenerate)
 			{
 				//TODO: Check type and write the correct method
@@ -239,6 +244,36 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 		}
 
 		productionContext.AddSource(GetHintName(data), file.ToString());
+	}
+
+	private static void WriteServiceProviderGetService(in SourceProductionContext context, in ImmutableArray<TypeToGenerate> types, ClassScope scope)
+	{
+		context.CancellationToken.ThrowIfCancellationRequested();
+		
+		using PoolHandle<StringBuilder> stringBuilderScope = StringBuilderPool.Get(out StringBuilder? sb);
+
+		using (MethodScope getService = scope.AddMethod("GetService", "object?").WithAccessor(MethodAccessor.Public))
+		{
+			getService.AddParameter("global::System.Type", "serviceType");
+			
+			getService.AppendLine("return serviceType switch");
+			
+			using (getService.WithIndent(1, true))
+			{
+				foreach (TypeToGenerate type in types)
+				{
+					getService.Append("_ when serviceType == typeof(");
+					getService.Append(type.Type.Name.FullyQualifiedName);
+					getService.Append(") => ((global::Hertzole.PureDependencies.IServiceProvider<");
+					getService.Append(type.Type.Name.FullyQualifiedName);
+					getService.AppendLine(">) this).GetService(),");
+				}
+				
+				getService.AppendLine("_ => null");
+			}
+
+			getService.Append(';');
+		}
 	}
 
 	private static void WriteSingleton(in SourceProductionContext context, in TypeToGenerate type, ClassScope typeScope)
