@@ -4,14 +4,14 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <AssemblyName>Hertzole.PureDependencies</AssemblyName>
         <RootNamespace>Hertzole.PureDependencies</RootNamespace>
-        <AssemblyVersion>1.1.0-develop.1</AssemblyVersion>        
+        <AssemblyVersion>1.1.0.2</AssemblyVersion>        
     </PropertyGroup>
     
     <PropertyGroup>
         <Title>Pure Dependencies</Title>
         <Authors>Hertzole</Authors>
         <Company>Hertzole</Company>
-        <Version>1.1.0-develop.1</Version>
+        <Version>1.1.0.2</Version>
         <Description>Source generated dependency injection</Description>
         
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

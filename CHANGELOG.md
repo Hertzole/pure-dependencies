@@ -1,3 +1,14 @@
+# [1.1.0-develop.2](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-develop.1...v1.1.0-develop.2) (2024-11-19)
+
+
+### Bug Fixes
+
+* assembly version in release workflow ([090b24a](https://github.com/Hertzole/pure-dependencies/commit/090b24a2c54b3a7db83deaa90b5ab24fc5e5cac2))
+* assembly versions ([6ba337f](https://github.com/Hertzole/pure-dependencies/commit/6ba337f93eebb456d2daf4cb3721c552050fd0c2))
+* assembly versions for real ([3bcb574](https://github.com/Hertzole/pure-dependencies/commit/3bcb57494ca62123d7d3dfd03e2181ded9357dee))
+* format_version permissions ([14bc51c](https://github.com/Hertzole/pure-dependencies/commit/14bc51cc69ccfd4232f2993dc032be23ee7389a5))
+* wrong format_version file ([e2ee8bb](https://github.com/Hertzole/pure-dependencies/commit/e2ee8bb5d6b72def7b65e628af49935fe781688b))
+
 # [1.1.0-develop.1](https://github.com/Hertzole/pure-dependencies/compare/v1.0.0...v1.1.0-develop.1) (2024-11-19)
 
 
