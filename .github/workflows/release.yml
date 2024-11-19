@@ -23,7 +23,6 @@ jobs:
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
         with:
-          dry_run: true
           extra_plugins: |
             @semantic-release/exec
             @semantic-release/changelog
@@ -45,26 +44,13 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet build -c Release
 
-      # - name: Pack NuGet Package
-      #   if: steps.semantic.outputs.new_release_published == 'true'
-      #   run: dotnet pack -c Release -o output
+      - name: Pack NuGet Package
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: dotnet pack -c Release -o output
 
-      # - name: Release
-      #   if: steps.semantic.outputs.new_release_published == 'true'
-      #   id: semantic_actual
-      #   uses: cycjimmy/semantic-release-action@v4
-      #   with:
-      #     dry_run: false
-      #     extra_plugins: |
-      #       @semantic-release/exec
-      #       @semantic-release/changelog
-      #       @semantic-release/git
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # - name: Publish to GitHub packages
-      #   if: steps.semantic_actual.outputs.new_release_published == 'true'
-      #   run: dotnet nuget push output/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      - name: Publish to GitHub packages
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: dotnet nuget push output/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
       # - name: Publish to NuGet
       #   run: dotnet nuget push output/*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
