@@ -28,7 +28,6 @@ jobs:
         if: steps.first_build.outcome == 'success'
         run: |
           chmod +x ./ci/prepare.sh
-          chmod +x ./ci/format_version.sh
 
       - name: Release
         id: semantic
