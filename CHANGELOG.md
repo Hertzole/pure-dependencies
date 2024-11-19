@@ -1,3 +1,10 @@
+# [1.1.0-beta.2](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2024-11-19)
+
+
+### Features
+
+* implement IServiceProvider in generated service provider ([7ab62d2](https://github.com/Hertzole/pure-dependencies/commit/7ab62d274aae7a0b173f16139c2a44f608375671))
+
 # [1.1.0-beta.1](https://github.com/Hertzole/pure-dependencies/compare/v1.0.0...v1.1.0-beta.1) (2024-11-19)
 
 

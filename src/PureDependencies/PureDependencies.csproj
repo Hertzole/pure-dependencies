@@ -11,7 +11,7 @@
         <Title>Pure Dependencies</Title>
         <Authors>Hertzole</Authors>
         <Company>Hertzole</Company>
-        <Version>1.1.0-beta.1</Version>
+        <Version>1.1.0-beta.2</Version>
         <Description>Source generated dependency injection</Description>
         
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
