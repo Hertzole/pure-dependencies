@@ -31,19 +31,24 @@ jobs:
 
       - name: Install .NET
         uses: actions/setup-dotnet@v4
+        if: steps.semantic.outputs.new_release_published == 'true'
         with:
           dotnet-version: 9
 
       - name: Add NuGet Source
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
       - name: Build
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet build -c Release
 
       - name: Pack NuGet Package
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet pack -c Release -o output
 
       - name: Publish to GitHub packages
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet nuget push output/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
       # - name: Publish to NuGet
