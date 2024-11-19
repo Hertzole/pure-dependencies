@@ -32,7 +32,7 @@
         },
         {
             "name": "develop",
-            "prerelease": true
+            "prerelease": ".1"
         }
     ]
 }
