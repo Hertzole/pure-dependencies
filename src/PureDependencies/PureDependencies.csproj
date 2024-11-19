@@ -4,9 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <AssemblyName>Hertzole.PureDependencies</AssemblyName>
         <RootNamespace>Hertzole.PureDependencies</RootNamespace>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>0.1.0.0</FileVersion>
-        
+        <AssemblyVersion>1.0.0</AssemblyVersion>        
     </PropertyGroup>
     
     <PropertyGroup>
@@ -15,6 +13,8 @@
         <Company>Hertzole</Company>
         <Version>1.0.0</Version>
         <Description>Source generated dependency injection</Description>
+        
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -25,6 +25,7 @@
         <!-- Include the generator in the package -->
         <ProjectReference Include="..\..\src\PureDependencies.Generator\PureDependencies.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         <None Include="..\..\src\PureDependencies.Generator\bin\$(Configuration)\netstandard2.0\Hertzole.PureDependencies.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs"/>
+        <None Include="bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml" Pack="true" PackagePath="\"/>
     </ItemGroup>
     
     <ItemGroup>
