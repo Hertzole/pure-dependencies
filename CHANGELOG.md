@@ -1,3 +1,10 @@
+# [1.1.0-beta.3](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2024-11-25)
+
+
+### Bug Fixes
+
+* call .Dispose directly if we know it isn't IAsyncDisposable ([857b184](https://github.com/Hertzole/pure-dependencies/commit/857b1845af157042a1dee03906f48fb521b420f9))
+
 # [1.1.0-beta.2](https://github.com/Hertzole/pure-dependencies/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2024-11-19)
 
 
