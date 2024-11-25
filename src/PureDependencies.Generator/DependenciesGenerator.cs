@@ -639,29 +639,9 @@ public sealed class DependenciesGenerator : IIncrementalGenerator
 				}
 				else if ((type.Type.DisposableFlags & DisposableFlags.Disposable) != 0)
 				{
-					disposeAsyncCore.Append("if (");
 					disposeAsyncCore.Append(type.Type.Name.MinimalName);
-					disposeAsyncCore.Append(" is global::System.IAsyncDisposable ");
-					disposeAsyncCore.Append(type.Type.Name.MinimalName);
-					disposeAsyncCore.AppendLine("_AsyncDisposable)");
+					disposeAsyncCore.AppendLine("?.Dispose();");
 
-					using (disposeAsyncCore.WithIndent(1, true))
-					{
-						disposeAsyncCore.Append("await ");
-						disposeAsyncCore.Append(type.Type.Name.MinimalName);
-						disposeAsyncCore.AppendLine("_AsyncDisposable.DisposeAsync();");
-					}
-
-					disposeAsyncCore.AppendLine();
-					disposeAsyncCore.AppendLine("else");
-
-					using (disposeAsyncCore.WithIndent(1, true))
-					{
-						disposeAsyncCore.Append(type.Type.Name.MinimalName);
-						disposeAsyncCore.AppendLine("?.Dispose();");
-					}
-
-					disposeAsyncCore.AppendLine();
 					disposeAsyncCore.Append(type.Type.Name.MinimalName);
 					disposeAsyncCore.AppendLine(" = null;");
 				}
